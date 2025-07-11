@@ -107,7 +107,6 @@ npm install
 
 ## Additional Notes
 
-- **Dependency Injection:** Configured in `eCommerceApp.Host/Program.cs`
 - **Swagger:** Enabled at `/swagger` for API docs
 - **Frontend:** Uses Vite, React, Tailwind CSS
 - **Backend:** Uses Clean Architecture, EF Core, JWT Auth, etc.
