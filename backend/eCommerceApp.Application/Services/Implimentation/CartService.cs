@@ -17,6 +17,22 @@ namespace eCommerceApp.Application.Services.Implimentation
         IPaymentService paymentService
         ) : ICartService
     {
+        public async Task<int> AddToCart(Guid ProductId, string userId)
+        {
+            return await cartInterface.AddToCart(ProductId, userId);
+        }
+
+        public async Task<int> RemoveToCart(Guid ProductId, string userId)
+        {
+            return await cartInterface.RemoveToCart(ProductId, userId);
+        }
+
+        public async Task<IEnumerable<CartItemDto>> GetCartItems(string userId, bool admin = false)
+        {
+            var cartItems = await cartInterface.GetCartItems(userId, admin);
+            return mapper.Map<IEnumerable<CartItemDto>>(cartItems);
+        }
+
         public async Task<ServiceResponse> Checkout(Checkout checkout)
         {
             var (products, totalAmount) = await GetCartTotalAmount(checkout.Carts);
@@ -33,7 +49,7 @@ namespace eCommerceApp.Application.Services.Implimentation
 
             if (checkout.PaymentMethodId == paymentMethods.FirstOrDefault()!.Id)
                 return await paymentService.Pay(totalAmount, products, checkout.Carts);
-            
+
             return new ServiceResponse { Success = false, Message = "invalid payment method" };
         }
         public async Task<ServiceResponse> SaveCheckoutHistory(IEnumerable<CreateAchieve> achieves)

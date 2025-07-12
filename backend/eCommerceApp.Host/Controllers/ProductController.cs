@@ -1,11 +1,14 @@
-﻿using eCommerceApp.Application.DTOs;
+﻿using System.Security.Claims;
+using eCommerceApp.Application.DTOs;
 using eCommerceApp.Application.DTOs.Product;
 using eCommerceApp.Application.Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eCommerceApp.Host.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -19,7 +22,9 @@ namespace eCommerceApp.Host.Controllers
         [HttpGet("all")]
         public async Task<IActionResult> GetAll()
         {
-            var data = await _cateogryService.GetAllAsync();
+            // Get the user id from the claims
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            var data = await _cateogryService.GetAllAsync(userId!);
             return data.Count() > 0 ? Ok(data) : NotFound(data);
         }
 

@@ -18,6 +18,7 @@ namespace eCommerceApp.Infrastructure.Data
         public DbSet<RefreshToken> RefreshTokens { get; internal set; }
         public DbSet<PaymentMethod> PaymentMethods { get; internal set; }
         public DbSet<Achieve> CheckoutAchieve { get; internal set; }
+        public DbSet<CartItem> CartItems { get; internal set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -27,6 +28,19 @@ namespace eCommerceApp.Infrastructure.Data
             modelBuilder.Entity<Product>()
                 .Property(p => p.Price)
                 .HasPrecision(18, 2); // 18 digits total, 2 after the decimal
+
+            // Configure CartItem relationships
+            modelBuilder.Entity<CartItem>()
+                .HasOne(ci => ci.Product)
+                .WithMany(p => p.CartItems)
+                .HasForeignKey(ci => ci.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CartItem>()
+                .HasOne(ci => ci.User)
+                .WithMany()
+                .HasForeignKey(ci => ci.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<PaymentMethod>()
                 .HasData(

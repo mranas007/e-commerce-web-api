@@ -28,7 +28,8 @@ namespace eCommerceApp.Application.Mapping
             CreateMap<PaymentMethod, GetPaymentMethod>();
             CreateMap<CreateAchieve, Achieve>();
 
-
+            CreateMap<CartItem, CartItemDto>();
+            CreateMap<Product, ProductDto>();
         }
     }
 }

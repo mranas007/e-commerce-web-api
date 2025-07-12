@@ -51,13 +51,13 @@ namespace eCommerceApp.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "30f85ecb-12e4-48f2-b3be-29ab4849f7e2",
+                            Id = "3ab7778d-5d8c-41a6-801f-6f4c99fd491d",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "d13cac40-a6d2-4eb2-b466-15e837dcb172",
+                            Id = "34f9a1e9-be7a-4379-91cb-621266cd7f1a",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -196,6 +196,37 @@ namespace eCommerceApp.Infrastructure.Migrations
                     b.ToTable("CheckoutAchieve");
                 });
 
+            modelBuilder.Entity("eCommerceApp.Domain.Entities.Cart.CartItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CartItems");
+                });
+
             modelBuilder.Entity("eCommerceApp.Domain.Entities.Cart.PaymentMethod", b =>
                 {
                     b.Property<Guid>("Id")
@@ -213,7 +244,7 @@ namespace eCommerceApp.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("2645d6b1-7c4f-4ef7-bf80-5d9fba32b5a1"),
+                            Id = new Guid("7194c463-0d21-4676-b029-a9942c5ee2d8"),
                             Name = "Credit Card"
                         });
                 });
@@ -412,6 +443,25 @@ namespace eCommerceApp.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("eCommerceApp.Domain.Entities.Cart.CartItem", b =>
+                {
+                    b.HasOne("eCommerceApp.Domain.Entities.Product", "Product")
+                        .WithMany("CartItems")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("eCommerceApp.Domain.Entities.Identity.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("eCommerceApp.Domain.Entities.Product", b =>
                 {
                     b.HasOne("eCommerceApp.Domain.Entities.Category", "Category")
@@ -426,6 +476,11 @@ namespace eCommerceApp.Infrastructure.Migrations
             modelBuilder.Entity("eCommerceApp.Domain.Entities.Category", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("eCommerceApp.Domain.Entities.Product", b =>
+                {
+                    b.Navigation("CartItems");
                 });
 #pragma warning restore 612, 618
         }

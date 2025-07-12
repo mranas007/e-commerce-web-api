@@ -9,8 +9,9 @@ const FeaturedProducts = ({ products }) => (
             {products.map((product) => (
                 <Card
                     key={product.id}
+                    id={product.id}
                     image={product.image}
-                    title={product.title}
+                    title={product.name}
                     description={product.description}
                     price={product.price}
                     rating={product.rating}

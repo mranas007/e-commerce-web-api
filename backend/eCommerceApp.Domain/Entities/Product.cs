@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using eCommerceApp.Domain.Entities.Cart;
 
 namespace eCommerceApp.Domain.Entities
 {
@@ -19,12 +20,17 @@ namespace eCommerceApp.Domain.Entities
         public string? Image { get; set; }
         [Required]
         public int Quantity { get; set; }
+
+
         public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
+
+
         [Required]
         public Guid CategoryId { get; set; }
-
         [ForeignKey(nameof(CategoryId))]
         public Category? Category { get; set; } // navigation property 
+
+        public ICollection<CartItem>? CartItems { get; set; }
     }
 }
