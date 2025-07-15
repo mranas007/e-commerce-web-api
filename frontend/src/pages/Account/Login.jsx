@@ -20,12 +20,39 @@ const Login = () => {
         setError("");
         try {
             const res = await axiosInstance.post("/Authentication/login", form);
-            // Assuming API returns { token, user }
-            login(res.data.token, res.data.user);
-            navigate("/home");
+            
+            // The API response is expected to be:
+            // {
+            //   message: "...",
+            //   refreshToken: "...",
+            //   role: "...",
+            //   success: true,
+            //   token: "..."
+            // }
+
+            const responseData = res.data;
+            const token = responseData.token;
+            // Build user object from response
+            const user = {
+                role: responseData.role || "User",
+                refreshToken: responseData.refreshToken,
+                message: responseData.message,
+                success: responseData.success,
+                // You can add more fields if needed
+            };
+
+            login(token, user);
+
+            // Redirect based on user role
+            if (user.role === "Admin") {
+                navigate("/admin");
+            } else {
+                navigate("/home");
+            }
         } catch (err) {
             setError(
                 err.response?.data?.message ||
+                err.response?.data?.error ||
                 "Login failed. Please try again."
             );
         } finally {

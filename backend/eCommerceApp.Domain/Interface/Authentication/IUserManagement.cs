@@ -12,5 +12,9 @@ namespace eCommerceApp.Domain.Interface.Authentication
         Task<IEnumerable<AppUser>?> GetAllUsersAsync();
         Task<int> RemovUserByEmailAsync(string email);
         Task<List<Claim>> GetUserClaimsAsync(string email);
+        Task<string> GenerateEmailConfirmationToken(AppUser user);
+        Task<int> SendUserConfirmation(string email, string baseUrl);
+        Task<bool> IsEmailConfirm(string userEmail);
+        Task<bool> ConfirmUserForEmail(AppUser user, string token);
     }
 }

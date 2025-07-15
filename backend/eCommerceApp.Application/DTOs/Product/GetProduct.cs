@@ -9,6 +9,6 @@ namespace eCommerceApp.Application.DTOs.Product
         [Required]
         public Guid Id { get; set; }
         public GetCategory? Category { get; set; }
-        public CartItem? CartItem { get; set; }
+        public ICollection<CartItem>? CartItems { get; set; }
     }
 }

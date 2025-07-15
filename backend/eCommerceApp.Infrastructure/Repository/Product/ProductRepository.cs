@@ -1,4 +1,5 @@
-﻿using eCommerceApp.Domain.Interface.Product;
+﻿using eCommerceApp.Domain.Entities.Cart;
+using eCommerceApp.Domain.Interface.Product;
 using eCommerceApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,12 +16,53 @@ namespace eCommerceApp.Infrastructure.Repository.Product
         }
 
         // Get all 
-        public async Task<IEnumerable<Domain.Entities.Product>> GetAllAsync(string? userId)
+        public async Task<IEnumerable<Domain.Entities.Product>> GetAllAsync(string? userId, string search, string category)
         {
-            // Fetch all products and include only CartItems for the given user
-            return await context.Products
-                .Include(p => p.CartItems!.Where(ci => ci.UserId == userId))
-                .ToListAsync();
+            // Start with base query including Category
+            var query = context.Products
+                .AsNoTracking()
+                .AsQueryable();
+
+            // Filter by category if provided
+            if (!string.IsNullOrEmpty(category))
+                query = query.Include(p => p.Category).Where(c => c.Category != null && c.Category.Name == category);
+            else
+                query = query.Include(p => p.Category);
+
+            // Filter by search if provided (search in Name and Description)
+            if (!string.IsNullOrEmpty(search))
+            {
+                string loweredSearch = search.ToLower();
+                query = query.Where(p =>
+                    (!string.IsNullOrEmpty(p.Name) && p.Name.ToLower().Contains(loweredSearch)) ||
+                    (!string.IsNullOrEmpty(p.Description) && p.Description.ToLower().Contains(loweredSearch))
+                );
+            }
+
+            // If userId is provided, include CartItems filtered by userId
+            if (!string.IsNullOrEmpty(userId))
+            {
+                query = query
+                    .Include(p => p.CartItems!
+                        .Where(c => c.UserId == userId));
+            }
+
+            return await query.Select(p => new Domain.Entities.Product
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+                Price = p.Price,
+                Image = p.Image,
+                Quantity = p.Quantity,
+                CreatedAt = p.CreatedAt,
+                UpdatedAt = p.UpdatedAt,
+                CategoryId = p.CategoryId,
+                Category = p.Category,
+                CartItems = !string.IsNullOrEmpty(userId)
+                    ? p.CartItems != null ? p.CartItems.Where(c => c.UserId == userId).ToList() : new List<CartItem>()
+                    : p.CartItems
+            }).ToListAsync();
         }
 
         // Get by ID

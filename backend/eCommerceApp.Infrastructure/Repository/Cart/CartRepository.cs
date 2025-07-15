@@ -37,9 +37,6 @@ namespace eCommerceApp.Infrastructure.Repository.Cart
         // get all cart items for a user
         public async Task<IEnumerable<CartItem>> GetCartItems(string userId, bool admin = false)
         {
-            // To avoid circular reference and over-fetching navigation properties,
-            // use AsNoTracking and only include the necessary navigation properties.
-            // Avoid deep navigation includes unless absolutely needed.
 
             IQueryable<CartItem> query = context.CartItems.AsNoTracking();
 
@@ -67,7 +64,6 @@ namespace eCommerceApp.Infrastructure.Repository.Cart
 
             return await query.ToListAsync();
         }
-
      
         public async Task<int> RemoveToCart(Guid productId, string userId)
         {

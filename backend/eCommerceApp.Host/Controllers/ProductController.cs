@@ -12,27 +12,31 @@ namespace eCommerceApp.Host.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly IProductService _cateogryService;
+        private readonly IProductService _productService;
         public ProductController(IProductService productService)
         {
-            _cateogryService = productService;
+            _productService = productService;
         }
 
         // get all
         [HttpGet("all")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            [FromQuery] string search = "",
+            [FromQuery] string category = "",
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 24)
         {
-            // Get the user id from the claims
             string userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-            var data = await _cateogryService.GetAllAsync(userId!);
-            return data.Count() > 0 ? Ok(data) : NotFound(data);
+            var data = await _productService.GetAllAsync(userId!, search!, category!);
+
+            return data.Any() ? Ok(data) : NotFound(data);
         }
 
         // get single
         [HttpGet("single/{id}")]
         public async Task<IActionResult> GetOne(Guid id)
         {
-            var data = await _cateogryService.GetByIdAsync(id);
+            var data = await _productService.GetByIdAsync(id);
             return data != null ? Ok(data) : NotFound(data);
         }
 
@@ -42,7 +46,7 @@ namespace eCommerceApp.Host.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            ServiceResponse result = await _cateogryService.AddAsync(createProduct);
+            ServiceResponse result = await _productService.AddAsync(createProduct);
             return result.Success ? Ok(result) : BadRequest(result.Message);
         }
 
@@ -52,15 +56,15 @@ namespace eCommerceApp.Host.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            ServiceResponse result = await _cateogryService.UpdateAsync(updateProduct);
+            ServiceResponse result = await _productService.UpdateAsync(updateProduct);
             return result.Success ? Ok(result) : BadRequest(result.Message);
         }
-        
+
         // delete
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            ServiceResponse result = await _cateogryService.DeleteAsync(id);
+            ServiceResponse result = await _productService.DeleteAsync(id);
             return result.Success ? Ok(result) : BadRequest(result.Message);
         }
 

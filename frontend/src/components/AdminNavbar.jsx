@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const AdminNavbar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -66,12 +66,16 @@ const AdminNavbar = () => {
               <div className="flex items-center">
                 <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                   <span className="text-white text-sm font-medium">
-                    A
+                    {user?.name?.charAt(0) || user?.fullname?.charAt(0) || 'A'}
                   </span>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-white">Admin</p>
-                  <p className="text-xs text-gray-400">Administrator</p>
+                  <p className="text-sm font-medium text-white">
+                    {user?.name || user?.fullname || 'Admin'}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {isAdmin() ? 'Administrator' : 'User'}
+                  </p>
                 </div>
               </div>
               <button

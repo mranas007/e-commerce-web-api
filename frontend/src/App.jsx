@@ -1,4 +1,4 @@
-import { BrowserRouter, useLocation } from "react-router-dom";
+import { BrowserRouter, useLocation, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -7,7 +7,7 @@ import AppRoutes from "./Routes";
 function Layout() {
   const location = useLocation();
   // Check if the path starts with /register, /login, or /confirmation (case-insensitive)
-  const hideLayout = /^\/(register|login|confirmation)/i.test(location.pathname);
+  const hideLayout = /^\/(register|login|confirmation|confirm-email)/i.test(location.pathname);
 
   return (
     <>

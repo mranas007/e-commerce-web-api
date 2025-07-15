@@ -3,9 +3,32 @@ import { FaStar, FaStarHalfAlt, FaRegStar, FaShoppingCart } from "react-icons/fa
 import axiosInstance from "../utils/axiosConfig";
 import { useAuth } from "../contexts/AuthContext";
 
-const Card = ({ id, image, title, description, price, rating = 0 }) => {
+const Card = ({
+  id,
+  image,
+  title,
+  description,
+  price,
+  rating = 0,
+  cartItems = [],
+}) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [alreadyInCart, setAlreadyInCart] = useState(false);
   const { user, token } = useAuth();
+
+  // Check if this product is already in the cart
+  React.useEffect(() => {
+    if (Array.isArray(cartItems)) {
+      // cartItems may have productId or product object with id
+      const found = cartItems.some(
+        (item) =>
+          (item.productId && item.productId === id) ||
+          (item.product && item.product.id === id)
+      );
+      setAlreadyInCart(found);
+    }
+  }, [cartItems, id]);
 
   // Generate rating stars
   const renderRatingStars = (rating) => {
@@ -38,17 +61,16 @@ const Card = ({ id, image, title, description, price, rating = 0 }) => {
       window.location.href = "/login";
       return;
     }
-
+    setAdding(true);
     try {
-      console.log(id);
-      const res = await axiosInstance.post("/Cart/add-to-cart?productId=" + id);
-      console.log('Item added to cart');
-      console.log(res.data);
-      
+      await axiosInstance.post("/Cart/add-to-cart?productId=" + id);
+      setAlreadyInCart(true);
     } catch (err) {
-      console.log(err.response.data);
+      console.log(err?.response?.data || err);
+    } finally {
+      setAdding(false);
     }
-  }
+  };
 
   return (
     <div
@@ -87,14 +109,25 @@ const Card = ({ id, image, title, description, price, rating = 0 }) => {
 
         <p className="text-gray-600 text-sm line-clamp-2 mb-3">{description}</p>
 
-        {/* Add to cart button */}
-        <button
-          onClick={handleAddToCart}
-          className={`w-full py-2 px-4 rounded-md flex items-center justify-center transition-colors duration-300 bg-blue-600 hover:bg-blue-700 text-white`}
-        >
-          <FaShoppingCart className="mr-2" />
-          Add to Cart
-        </button>
+        {/* Add to cart button or Already in Cart */}
+        {alreadyInCart ? (
+          <button
+            disabled
+            className="w-full py-2 px-4 rounded-md flex items-center justify-center bg-gray-400 text-white cursor-not-allowed"
+          >
+            <FaShoppingCart className="mr-2" />
+            Already in Cart
+          </button>
+        ) : (
+          <button
+            onClick={handleAddToCart}
+            disabled={adding}
+            className={`w-full py-2 px-4 rounded-md flex items-center justify-center transition-colors duration-300 bg-blue-600 hover:bg-blue-700 text-white ${adding ? 'opacity-60 cursor-not-allowed' : ''}`}
+          >
+            <FaShoppingCart className="mr-2" />
+            {adding ? "Adding..." : "Add to Cart"}
+          </button>
+        )}
         <button
           className="w-full mt-2 py-2 px-4 rounded-md flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-800 transition-colors duration-300"
           onClick={() => window.location.href = `/product/${id.replace(/\s+/g, '-').toLowerCase()}`}

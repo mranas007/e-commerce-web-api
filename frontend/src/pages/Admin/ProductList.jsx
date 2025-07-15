@@ -3,7 +3,6 @@ import { FaEdit, FaTrash, FaPlus, FaSearch, FaEye } from "react-icons/fa";
 import axiosInstance from "../../utils/axiosConfig";
 import { useAuth } from "../../contexts/AuthContext";
 import AdminNavbar from "../../components/AdminNavbar";
-import { Navigate } from "react-router-dom";
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
@@ -12,7 +11,7 @@ const ProductList = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
-  const { user, token } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchProducts();
@@ -60,11 +59,6 @@ const ProductList = () => {
       currency: 'USD'
     }).format(price);
   };
-
-  // Check authentication
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
 
   if (loading) {
     return (

@@ -3,10 +3,9 @@ import { FaBox, FaUsers, FaShoppingCart, FaChartLine, FaCog, FaPlus } from "reac
 import { useAuth } from "../../contexts/AuthContext";
 import axiosInstance from "../../utils/axiosConfig";
 import AdminNavbar from "../../components/AdminNavbar";
-import { Navigate } from "react-router-dom";
 
 const Dashboard = () => {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [stats, setStats] = useState({
     totalProducts: 0,
     totalUsers: 0,
@@ -36,8 +35,6 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
-
-
 
   const adminMenuItems = [
     {
@@ -77,11 +74,6 @@ const Dashboard = () => {
     }
   ];
 
-  // Check authentication
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -100,7 +92,7 @@ const Dashboard = () => {
             <div className="flex justify-between items-center py-6">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-                <p className="text-gray-600 mt-1">Welcome back, {user?.name || 'Admin'}</p>
+                <p className="text-gray-600 mt-1">Welcome back, {user?.name || user?.fullname || 'Admin'}</p>
               </div>
             </div>
           </div>

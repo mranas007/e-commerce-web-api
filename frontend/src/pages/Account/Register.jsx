@@ -8,7 +8,6 @@ const Register = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate();
-    const { login } = useAuth();
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -16,16 +15,23 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        // Validate password confirmation
+        if (form.password !== form.confirmPassword) {
+            setError("Passwords do not match");
+            return;
+        }
+        
         setLoading(true);
         setError("");
         try {
             const res = await axiosInstance.post("/Authentication/create", form);
-            // Assuming API returns { token, user }
-            login(res.data.token, res.data.user);
+            console.log(res.data);
             navigate("/confirmation");
         } catch (err) {
             setError(
                 err.response?.data?.message ||
+                err.response?.data?.error ||
                 "Registration failed. Please try again."
             );
         } finally {
@@ -76,7 +82,7 @@ const Register = () => {
                         />
                     </div>
                     <div>
-                        <label className="block mb-1 font-medium">Password</label>
+                        <label className="block mb-1 font-medium">Confirm Password</label>
                         <input
                             type="password"
                             name="confirmPassword"

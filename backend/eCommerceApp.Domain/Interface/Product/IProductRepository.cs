@@ -10,7 +10,7 @@ namespace eCommerceApp.Domain.Interface.Product
     public interface IProductRepository
     {
         Task<int> AddAsync(Domain.Entities.Product product);
-        Task<IEnumerable<Domain.Entities.Product>> GetAllAsync(string userId);
+        Task<IEnumerable<Domain.Entities.Product>> GetAllAsync(string userId, string search, string category);
         Task<Domain.Entities.Product> GetByIdAsync(Guid id);
         Task<int> UpdateAsync(Domain.Entities.Product product);
         Task<int> DeleteAsync(Guid id);

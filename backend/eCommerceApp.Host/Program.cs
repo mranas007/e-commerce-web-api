@@ -43,7 +43,7 @@ builder.Services.AddCors(options =>
     {
         policy.AllowAnyHeader()
               .AllowAnyMethod()
-              //.AllowAnyOrigin() 
+              //.AllowAnyOrigin()
               .WithOrigins("http://localhost:5173")
               .AllowCredentials();
     });

@@ -39,10 +39,10 @@ namespace eCommerceApp.Application.Services.Implimentation
         }
 
         // Get All
-        public async Task<IEnumerable<GetProduct>> GetAllAsync(string? userId) // Complated
+        public async Task<IEnumerable<GetProduct>> GetAllAsync(string? userId, string search, string category)
         {
-          
-            var products = await productRepository.GetAllAsync(userId!);
+
+            var products = await productRepository.GetAllAsync(userId!, search!, category!);
             if (!products.Any())
                 return [];
 
