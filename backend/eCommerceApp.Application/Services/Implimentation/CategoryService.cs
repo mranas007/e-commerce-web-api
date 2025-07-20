@@ -72,10 +72,10 @@ namespace eCommerceApp.Application.Services.Implimentation
         }
 
         // Update
-        public async Task<ServiceResponse> UpdateAsync(UpdateCategory updateCategory) // Complated 
+        public async Task<ServiceResponse> UpdateAsync( UpdateCategory updateCategory) // Complated 
         {
             var mappedCateogry = _mapper.Map<Category>(updateCategory);
-            int resutl = await _category.UpdateAsync(mappedCateogry);
+            int resutl = await _category.UpdateAsync( mappedCateogry);
             if (resutl == 0)
                 return new ServiceResponse(false, "Category not Found!");
 

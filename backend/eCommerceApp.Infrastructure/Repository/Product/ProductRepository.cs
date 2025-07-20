@@ -1,18 +1,47 @@
-﻿using eCommerceApp.Domain.Entities.Cart;
+﻿using eCommerceApp.Domain.Entities;
+using System;
+using eCommerceApp.Domain.Entities.Cart;
 using eCommerceApp.Domain.Interface.Product;
 using eCommerceApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace eCommerceApp.Infrastructure.Repository.Product
 {
-    public class ProductRepository(AppDbContext context) : IProductRepository
+    public class ProductRepository(AppDbContext context,
+        IProductImagesRepository productImagesRepository) : IProductRepository
     {
 
         // Add
-        public async Task<int> AddAsync(Domain.Entities.Product product)
+        public async Task<int> AddAsync(Domain.Entities.Product product, IEnumerable<string> ImagesName)
         {
-            context.Products.Add(product);
-            return await context.SaveChangesAsync();
+            try
+            {
+                // Add product to context
+                await context.Products.AddAsync(product);
+                
+                // Save product first to get the ID
+                var result = await context.SaveChangesAsync();
+
+                if (result > 0 && ImagesName != null && ImagesName.Any())
+                {
+                    // Create and add product images
+                    var productImages = ImagesName.Select(imageName => new ProductImage
+                    {
+                        Url = imageName,
+                        ProductId = product.Id
+                    });
+
+                    // Add all images in batch
+                    await productImagesRepository.AddRangeAsync(productImages);
+                }
+
+                return result;
+            }
+            catch (Exception)
+            {
+                // If anything fails, return 0 to indicate failure
+                return -1;
+            }
         }
 
         // Get all 
@@ -53,7 +82,7 @@ namespace eCommerceApp.Infrastructure.Repository.Product
                 Name = p.Name,
                 Description = p.Description,
                 Price = p.Price,
-                Image = p.Image,
+                Images = p.Images.ToList(),
                 Quantity = p.Quantity,
                 CreatedAt = p.CreatedAt,
                 UpdatedAt = p.UpdatedAt,
@@ -86,5 +115,6 @@ namespace eCommerceApp.Infrastructure.Repository.Product
             context.Products.Remove(product);
             return await context.SaveChangesAsync();
         }
+
     }
 }

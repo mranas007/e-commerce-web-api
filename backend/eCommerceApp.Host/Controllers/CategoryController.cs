@@ -43,14 +43,14 @@ namespace eCommerceApp.Host.Controllers
 
         // update
         [HttpPut("update")]
-        public async Task<IActionResult> Update(UpdateCategory updateCategory)
+        public async Task<IActionResult> Update( UpdateCategory updateCategory)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                ServiceResponse result = await _cateogryService.UpdateAsync(updateCategory);
+                ServiceResponse result = await _cateogryService.UpdateAsync( updateCategory);
                 return result.Success ? Ok(result) : BadRequest(result.Message);
             }
             catch (Exception ex)

@@ -11,6 +11,8 @@ import ProductList from "./pages/Admin/ProductList";
 import ProductForm from "./pages/Admin/ProductForm";
 import EditProduct from "./pages/Admin/EditProduct";
 import ViewProduct from "./pages/Admin/ViewProduct";
+import CategoryList from "./pages/Admin/CategoryList";
+import CategoryForm from "./pages/Admin/CategoryForm";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ConfirmEmail from "./pages/Account/ConfirmEmail";
 
@@ -67,6 +69,21 @@ const AppRoutes = () => (
     <Route path="/admin/products/:id" element={
       <ProtectedRoute requireAdmin={true}>
         <ViewProduct />
+      </ProtectedRoute>
+    } />
+    <Route path="/admin/categories" element={
+      <ProtectedRoute requireAdmin={true}>
+        <CategoryList />
+      </ProtectedRoute>
+    } />
+    <Route path="/admin/categories/add" element={
+      <ProtectedRoute requireAdmin={true}>
+        <CategoryForm />
+      </ProtectedRoute>
+    } />
+    <Route path="/admin/categories/edit/:id" element={
+      <ProtectedRoute requireAdmin={true}>
+        <CategoryForm />
       </ProtectedRoute>
     } />
   </Routes>

@@ -42,11 +42,15 @@ namespace eCommerceApp.Host.Controllers
 
         // Add
         [HttpPost("add")]
-        public async Task<IActionResult> Add(CreateProduct createProduct)
+        public async Task<IActionResult> Add([FromForm] CreateProduct createProduct, [FromForm] ICollection<IFormFile> imageFiles)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            ServiceResponse result = await _productService.AddAsync(createProduct);
+
+            if (imageFiles == null || imageFiles.Count == 0)
+                return BadRequest("Image file not found.");
+
+            ServiceResponse result = await _productService.AddAsync(createProduct, imageFiles);
             return result.Success ? Ok(result) : BadRequest(result.Message);
         }
 

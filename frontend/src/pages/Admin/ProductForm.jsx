@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { FaSave, FaTimes, FaUpload, FaSpinner } from "react-icons/fa";
+import { FaSave, FaUpload, FaSpinner } from "react-icons/fa";
+import AdminHeader from "../../components/Admin/AdminHeader";
+import ImageModal from "../../components/Admin/ImageModal";
 import { useParams, useNavigate, Navigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosConfig";
-import AdminNavbar from "../../components/AdminNavbar";
+
 import { useAuth } from "../../contexts/AuthContext";
 
 const ProductForm = () => {
@@ -12,7 +14,10 @@ const ProductForm = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
-  
+
+  // Categories state
+  const [categories, setCategories] = useState(["All"]);
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -24,6 +29,15 @@ const ProductForm = () => {
   });
 
   const [errors, setErrors] = useState({});
+
+  // Fetch categories on mount
+  useEffect(() => {
+    axiosInstance.get("/Category/all")
+      .then((categoriesRes) => {
+        setCategories(["All", ...categoriesRes.data]);
+      })
+      .catch(() => setCategories(["All"]));
+  }, []);
 
   useEffect(() => {
     if (id) {
@@ -88,7 +102,7 @@ const ProductForm = () => {
       ...prev,
       [name]: type === "checkbox" ? checked : value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
@@ -115,7 +129,7 @@ const ProductForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -158,30 +172,16 @@ const ProductForm = () => {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <AdminNavbar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="bg-white shadow-sm border-b">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-6">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">
-                  {id ? "Edit Product" : "Add New Product"}
-                </h1>
-                <p className="text-gray-600 mt-1">
-                  {id ? "Update product information" : "Create a new product listing"}
-                </p>
-              </div>
-              <button
-                onClick={() => navigate("/admin/products")}
-                className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
-              >
-                <FaTimes />
-                <span>Cancel</span>
-              </button>
-            </div>
-          </div>
-        </div>
+        <AdminHeader
+          title={id ? "Edit Product" : "Add New Product"}
+          subtitle={id ? "Update product information" : "Create a new product listing"}
+          showCancelButton={true}
+          onCancelClick={() => navigate("/admin/products")}
+          showSaveButton={true}
+          onSaveClick={handleSubmit}
+          saveButtonLoading={saving}
+        />
 
         {/* Main Content */}
         <div className="flex-1 overflow-auto">
@@ -226,14 +226,11 @@ const ProductForm = () => {
                   }`}
                 >
                   <option value="">Select category</option>
-                  <option value="Electronics">Electronics</option>
-                  <option value="Clothing">Clothing</option>
-                  <option value="Books">Books</option>
-                  <option value="Home & Garden">Home & Garden</option>
-                  <option value="Sports">Sports</option>
-                  <option value="Beauty">Beauty</option>
-                  <option value="Toys">Toys</option>
-                  <option value="Other">Other</option>
+                  {categories.map((cat, idx) => (
+                    <option key={idx} value={cat === "All" ? "" : cat}>
+                      {cat}
+                    </option>
+                  ))}
                 </select>
                 {errors.category && (
                   <p className="text-red-500 text-sm mt-1">{errors.category}</p>
@@ -401,4 +398,4 @@ const ProductForm = () => {
   );
 };
 
-export default ProductForm; 
+export default ProductForm;

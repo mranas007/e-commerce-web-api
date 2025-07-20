@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { FaBox, FaUsers, FaShoppingCart, FaChartLine, FaCog, FaPlus } from "react-icons/fa";
+import AdminHeader from "../../components/Admin/AdminHeader";
 import { useAuth } from "../../contexts/AuthContext";
 import axiosInstance from "../../utils/axiosConfig";
-import AdminNavbar from "../../components/AdminNavbar";
+
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -84,19 +85,11 @@ const Dashboard = () => {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <AdminNavbar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-6">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-                <p className="text-gray-600 mt-1">Welcome back, {user?.name || user?.fullname || 'Admin'}</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <AdminHeader
+          title="Admin Dashboard"
+          subtitle={`Welcome back, ${user?.name || user?.fullname || 'Admin'}`}
+        />
 
         {/* Main Content */}
         <div className="flex-1 overflow-auto">
@@ -220,4 +213,4 @@ const Dashboard = () => {
     </div>
   );
 }
-export default Dashboard; 
+export default Dashboard;

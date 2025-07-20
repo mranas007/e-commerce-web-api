@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaArrowLeft, FaEye, FaTimes } from "react-icons/fa";
+import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
+import AdminHeader from "../../components/Admin/AdminHeader";
+import DeleteConfirmationModal from "../../components/Admin/DeleteConfirmationModal";
+import ImageModal from "../../components/Admin/ImageModal";
 import { useParams, useNavigate, Navigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosConfig";
 import AdminNavbar from "../../components/AdminNavbar";
@@ -101,42 +104,27 @@ const ViewProduct = () => {
     <div className="flex h-screen bg-gray-50">
       <AdminNavbar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="bg-white shadow-sm border-b">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-6">
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => navigate("/admin/products")}
-                  className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
-                >
-                  <FaArrowLeft />
-                  <span>Back to Products</span>
-                </button>
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900">Product Details</h1>
-                  <p className="text-gray-600 mt-1">View and manage product information</p>
-                </div>
-              </div>
-              <div className="flex space-x-3">
-                <button
-                  onClick={() => navigate(`/admin/products/edit/${id}`)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center space-x-2"
-                >
-                  <FaEdit />
-                  <span>Edit Product</span>
-                </button>
-                <button
-                  onClick={() => setShowDeleteModal(true)}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center space-x-2"
-                >
-                  <FaTrash />
-                  <span>Delete</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <AdminHeader
+          title="Product Details"
+          subtitle="View and manage product information"
+          showBackButton={true}
+          onBackClick={() => navigate("/admin/products")}
+        >
+          <button
+            onClick={() => navigate(`/admin/products/edit/${id}`)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center space-x-2"
+          >
+            <FaEdit />
+            <span>Edit Product</span>
+          </button>
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center space-x-2"
+          >
+            <FaTrash />
+            <span>Delete</span>
+          </button>
+        </AdminHeader>
 
         {/* Main Content */}
         <div className="flex-1 overflow-auto">
@@ -261,53 +249,22 @@ const ViewProduct = () => {
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Confirm Delete</h3>
-            <p className="text-gray-600 mb-6">
-              Are you sure you want to delete "{product.name}"? This action cannot be undone.
-            </p>
-            <div className="flex space-x-3">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={deleting}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-              >
-                {deleting ? "Deleting..." : "Delete"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteConfirmationModal
+        show={showDeleteModal}
+        title="Confirm Delete"
+        message={`Are you sure you want to delete "${product.name}"? This action cannot be undone.`}
+        onConfirm={handleDelete}
+        onCancel={() => setShowDeleteModal(false)}
+      />
 
-      {/* Image Modal */}
-      {showImageModal && product.imageUrl && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-          <div className="relative max-w-4xl max-h-full p-4">
-            <button
-              onClick={() => setShowImageModal(false)}
-              className="absolute top-4 right-4 text-white hover:text-gray-300 text-2xl"
-            >
-              <FaTimes />
-            </button>
-            <img
-              src={product.imageUrl}
-              alt={product.name}
-              className="max-w-full max-h-full object-contain"
-            />
-          </div>
-        </div>
-      )}
+      <ImageModal
+        show={showImageModal}
+        imageUrl={product.imageUrl}
+        altText={product.name}
+        onClose={() => setShowImageModal(false)}
+      />
     </div>
   );
 };
 
-export default ViewProduct; 
+export default ViewProduct;

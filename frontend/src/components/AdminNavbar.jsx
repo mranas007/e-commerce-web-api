@@ -16,6 +16,7 @@ const AdminNavbar = () => {
   const navItems = [
     { name: "Dashboard", href: "/admin", icon: FaHome },
     { name: "Products", href: "/admin/products", icon: FaBox },
+    { name: "Categories", href: "/admin/categories", icon: FaBox },
     { name: "Users", href: "/admin/users", icon: FaUsers },
     { name: "Orders", href: "/admin/orders", icon: FaShoppingCart },
     { name: "Analytics", href: "/admin/analytics", icon: FaChartLine },
@@ -107,4 +108,4 @@ const AdminNavbar = () => {
   );
 };
 
-export default AdminNavbar; 
+export default AdminNavbar;

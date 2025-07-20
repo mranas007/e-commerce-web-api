@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaPlus, FaSearch, FaEye } from "react-icons/fa";
+import { FaPlus, FaSearch } from "react-icons/fa";
+import AdminProductCard from "../../components/Admin/AdminProductCard";
+import AdminHeader from "../../components/Admin/AdminHeader";
+import DeleteConfirmationModal from "../../components/Admin/DeleteConfirmationModal";
 import axiosInstance from "../../utils/axiosConfig";
 import { useAuth } from "../../contexts/AuthContext";
 import AdminNavbar from "../../components/AdminNavbar";
@@ -28,8 +31,9 @@ const ProductList = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get("/Product/get-all-products");
-      setProducts(response.data);
+      const response = await axiosInstance.get("/Product/all");
+      console.log(response.data);
+      // setProducts(response.data);
     } catch (error) {
       console.error("Error fetching products:", error);
     } finally {
@@ -72,24 +76,12 @@ const ProductList = () => {
     <div className="flex h-screen bg-gray-50">
       <AdminNavbar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-6">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
-                <p className="text-gray-600 mt-1">Manage your product inventory</p>
-              </div>
-              <button
-                onClick={() => window.location.href = '/admin/products/add'}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center space-x-2 transition-colors duration-200"
-              >
-                <FaPlus className="text-sm" />
-                <span>Add Product</span>
-              </button>
-            </div>
-          </div>
-        </div>
+        <AdminHeader
+          title="Product Management"
+          subtitle="Manage your product inventory"
+          showAddButton={true}
+          onAddClick={() => (window.location.href = "/admin/products/add")}
+        />
 
         {/* Main Content */}
         <div className="flex-1 overflow-auto">
@@ -129,65 +121,14 @@ const ProductList = () => {
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
-            <div key={product.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200">
-              <div className="relative">
-                <img
-                  src={product.imageUrl || "https://via.placeholder.com/300x200?text=No+Image"}
-                  alt={product.name}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="absolute top-2 right-2 flex space-x-1">
-                  <button
-                    onClick={() => window.location.href = `/admin/products/${product.id}`}
-                    className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors duration-200"
-                    title="View Details"
-                  >
-                    <FaEye className="text-xs" />
-                  </button>
-                  <button
-                    onClick={() => window.location.href = `/admin/products/edit/${product.id}`}
-                    className="bg-yellow-600 text-white p-2 rounded-full hover:bg-yellow-700 transition-colors duration-200"
-                    title="Edit Product"
-                  >
-                    <FaEdit className="text-xs" />
-                  </button>
-                  <button
-                    onClick={() => confirmDelete(product)}
-                    className="bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors duration-200"
-                    title="Delete Product"
-                  >
-                    <FaTrash className="text-xs" />
-                  </button>
-                </div>
-              </div>
-              
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900 text-lg mb-2 line-clamp-1">
-                  {product.name}
-                </h3>
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                  {product.description}
-                </p>
-                <div className="flex justify-between items-center">
-                  <span className="text-green-600 font-bold text-lg">
-                    {formatPrice(product.price)}
-                  </span>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    product.stock > 10 ? 'bg-green-100 text-green-800' :
-                    product.stock > 0 ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    {product.stock > 10 ? 'In Stock' : 
-                     product.stock > 0 ? 'Low Stock' : 'Out of Stock'}
-                  </span>
-                </div>
-                <div className="mt-2 text-xs text-gray-500">
-                  Stock: {product.stock || 0} units
-                </div>
-              </div>
-            </div>
+            <AdminProductCard
+              key={product.id}
+              product={product}
+              formatPrice={formatPrice}
+              confirmDelete={confirmDelete}
+            />
           ))}
         </div>
 
@@ -202,33 +143,15 @@ const ProductList = () => {
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Confirm Delete</h3>
-            <p className="text-gray-600 mb-6">
-              Are you sure you want to delete "{productToDelete?.name}"? This action cannot be undone.
-            </p>
-            <div className="flex space-x-3">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleDelete(productToDelete.id)}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteConfirmationModal
+        show={showDeleteModal}
+        title="Confirm Delete"
+        message={`Are you sure you want to delete "${productToDelete?.name}"? This action cannot be undone.`}
+        onConfirm={() => handleDelete(productToDelete.id)}
+        onCancel={() => setShowDeleteModal(false)}
+      />
     </div>
   );
 };
 
-export default ProductList; 
+export default ProductList;

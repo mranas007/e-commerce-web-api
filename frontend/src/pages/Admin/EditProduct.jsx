@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { FaSave, FaTimes, FaUpload, FaSpinner, FaTrash, FaEye } from "react-icons/fa";
+import { FaSave, FaUpload, FaSpinner, FaTrash, FaEye } from "react-icons/fa";
+import AdminHeader from "../../components/Admin/AdminHeader";
+import ImageModal from "../../components/Admin/ImageModal";
 import { useParams, useNavigate, Navigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosConfig";
-import AdminNavbar from "../../components/AdminNavbar";
+
 import { useAuth } from "../../contexts/AuthContext";
 
 const EditProduct = () => {
@@ -14,7 +16,7 @@ const EditProduct = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [originalImage, setOriginalImage] = useState(null);
   const [showImageModal, setShowImageModal] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -38,7 +40,7 @@ const EditProduct = () => {
       setLoading(true);
       const response = await axiosInstance.get(`/Product/get-product/${id}`);
       const product = response.data;
-      
+
       setFormData({
         name: product.name || "",
         description: product.description || "",
@@ -48,7 +50,7 @@ const EditProduct = () => {
         imageUrl: product.imageUrl || "",
         isActive: product.isActive !== undefined ? product.isActive : true
       });
-      
+
       if (product.imageUrl) {
         setImagePreview(product.imageUrl);
         setOriginalImage(product.imageUrl);
@@ -94,7 +96,7 @@ const EditProduct = () => {
       ...prev,
       [name]: type === "checkbox" ? checked : value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
@@ -129,7 +131,7 @@ const EditProduct = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -175,7 +177,6 @@ const EditProduct = () => {
   if (errors.fetch) {
     return (
       <div className="flex h-screen bg-gray-50">
-        <AdminNavbar />
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
@@ -194,48 +195,18 @@ const EditProduct = () => {
       </div>
     );
   }
-
   return (
     <div className="flex h-screen bg-gray-50">
-      <AdminNavbar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="bg-white shadow-sm border-b">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-6">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Edit Product</h1>
-                <p className="text-gray-600 mt-1">Update product information and settings</p>
-              </div>
-              <div className="flex space-x-3">
-                <button
-                  onClick={() => navigate("/admin/products")}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200 flex items-center space-x-2"
-                >
-                  <FaTimes />
-                  <span>Cancel</span>
-                </button>
-                <button
-                  onClick={handleSubmit}
-                  disabled={saving}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-2"
-                >
-                  {saving ? (
-                    <>
-                      <FaSpinner className="animate-spin" />
-                      <span>Saving...</span>
-                    </>
-                  ) : (
-                    <>
-                      <FaSave />
-                      <span>Save Changes</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <AdminHeader
+          title="Edit Product"
+          subtitle="Update product information and settings"
+          showBackButton={true}
+          onBackClick={() => navigate("/admin/products")}
+          showSaveButton={true}
+          onSaveClick={handleSubmit}
+          saveButtonLoading={saving}
+        />
 
         {/* Main Content */}
         <div className="flex-1 overflow-auto">
@@ -245,7 +216,7 @@ const EditProduct = () => {
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-lg shadow-sm p-6 sticky top-8">
                   <h2 className="text-lg font-semibold text-gray-900 mb-4">Product Preview</h2>
-                  
+
                   {/* Image Section */}
                   <div className="mb-6">
                     <div className="relative">
@@ -292,7 +263,7 @@ const EditProduct = () => {
                         {formData.price ? formatPrice(formData.price) : "$0.00"}
                       </p>
                     </div>
-                    
+
                     <div>
                       <p className="text-sm text-gray-600 line-clamp-3">
                         {formData.description || "No description available"}
@@ -306,19 +277,17 @@ const EditProduct = () => {
 
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Stock:</span>
-                      <span className={`text-sm font-medium ${
-                        formData.stock > 10 ? 'text-green-600' :
+                      <span className={`text-sm font-medium ${formData.stock > 10 ? 'text-green-600' :
                         formData.stock > 0 ? 'text-yellow-600' : 'text-red-600'
-                      }`}>
+                        }`}>
                         {formData.stock || 0} units
                       </span>
                     </div>
 
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Status:</span>
-                      <span className={`text-sm font-medium ${
-                        formData.isActive ? 'text-green-600' : 'text-red-600'
-                      }`}>
+                      <span className={`text-sm font-medium ${formData.isActive ? 'text-green-600' : 'text-red-600'
+                        }`}>
                         {formData.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </div>
@@ -330,7 +299,7 @@ const EditProduct = () => {
               <div className="lg:col-span-2">
                 <div className="bg-white rounded-lg shadow-sm p-6">
                   <h2 className="text-lg font-semibold text-gray-900 mb-6">Edit Product Details</h2>
-                  
+
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Product Name */}
@@ -343,9 +312,8 @@ const EditProduct = () => {
                           name="name"
                           value={formData.name}
                           onChange={handleInputChange}
-                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                            errors.name ? "border-red-500" : "border-gray-300"
-                          }`}
+                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.name ? "border-red-500" : "border-gray-300"
+                            }`}
                           placeholder="Enter product name"
                         />
                         {errors.name && (
@@ -362,9 +330,8 @@ const EditProduct = () => {
                           name="category"
                           value={formData.category}
                           onChange={handleInputChange}
-                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                            errors.category ? "border-red-500" : "border-gray-300"
-                          }`}
+                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.category ? "border-red-500" : "border-gray-300"
+                            }`}
                         >
                           <option value="">Select category</option>
                           <option value="Electronics">Electronics</option>
@@ -395,9 +362,8 @@ const EditProduct = () => {
                             onChange={handleInputChange}
                             step="0.01"
                             min="0"
-                            className={`w-full pl-8 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                              errors.price ? "border-red-500" : "border-gray-300"
-                            }`}
+                            className={`w-full pl-8 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.price ? "border-red-500" : "border-gray-300"
+                              }`}
                             placeholder="0.00"
                           />
                         </div>
@@ -417,9 +383,8 @@ const EditProduct = () => {
                           value={formData.stock}
                           onChange={handleInputChange}
                           min="0"
-                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                            errors.stock ? "border-red-500" : "border-gray-300"
-                          }`}
+                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.stock ? "border-red-500" : "border-gray-300"
+                            }`}
                           placeholder="0"
                         />
                         {errors.stock && (
@@ -438,9 +403,8 @@ const EditProduct = () => {
                         value={formData.description}
                         onChange={handleInputChange}
                         rows="4"
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                          errors.description ? "border-red-500" : "border-gray-300"
-                        }`}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.description ? "border-red-500" : "border-gray-300"
+                          }`}
                         placeholder="Enter product description"
                       />
                       {errors.description && (
@@ -496,6 +460,27 @@ const EditProduct = () => {
                         <p className="text-red-600">{errors.submit}</p>
                       </div>
                     )}
+
+                    {/* Action Buttons */}
+                    <div className="flex justify-end mt-6">
+                      <button
+                        type="submit"
+                        disabled={saving}
+                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-2"
+                      >
+                        {saving ? (
+                          <>
+                            <FaSpinner className="animate-spin" />
+                            <span>Saving...</span>
+                          </>
+                        ) : (
+                          <>
+                            <FaSave />
+                            <span>Save Changes</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </form>
                 </div>
               </div>
@@ -503,27 +488,14 @@ const EditProduct = () => {
           </div>
         </div>
       </div>
-
-      {/* Image Modal */}
-      {showImageModal && imagePreview && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-          <div className="relative max-w-4xl max-h-full p-4">
-            <button
-              onClick={() => setShowImageModal(false)}
-              className="absolute top-4 right-4 text-white hover:text-gray-300 text-2xl"
-            >
-              ×
-            </button>
-            <img
-              src={imagePreview}
-              alt="Product preview"
-              className="max-w-full max-h-full object-contain"
-            />
-          </div>
-        </div>
-      )}
+      <ImageModal
+        isOpen={showImageModal}
+        imageUrl={imagePreview}
+        altText="Product preview"
+        onClose={() => setShowImageModal(false)}
+      />
     </div>
   );
 };
 
-export default EditProduct; 
+export default EditProduct;

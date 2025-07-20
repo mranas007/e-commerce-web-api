@@ -8,29 +8,32 @@ namespace eCommerceApp.Domain.Entities
     {
         [Key]
         public Guid Id { get; set; }
+
         [Required]
-        public string? Name { get; set; }
+        public string Name { get; set; } = string.Empty;
+
         [Required]
-        public string? Description { get; set; }
+        public string Description { get; set; } = string.Empty;
+
         [Required]
         [DataType(DataType.Currency)]
         public decimal Price { get; set; }
-        [Required]
-        [DataType(DataType.ImageUrl)]
-        public string? Image { get; set; }
+        
+        public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
+
         [Required]
         public int Quantity { get; set; }
 
-
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
-
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         [Required]
         public Guid CategoryId { get; set; }
+
         [ForeignKey(nameof(CategoryId))]
-        public Category? Category { get; set; } // navigation property 
+        public Category? Category { get; set; } // Navigation property
 
         public ICollection<CartItem>? CartItems { get; set; }
+
     }
 }
