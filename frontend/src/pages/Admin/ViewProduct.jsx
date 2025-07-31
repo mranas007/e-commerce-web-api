@@ -5,7 +5,7 @@ import DeleteConfirmationModal from "../../components/Admin/DeleteConfirmationMo
 import ImageModal from "../../components/Admin/ImageModal";
 import { useParams, useNavigate, Navigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosConfig";
-import AdminNavbar from "../../components/AdminNavbar";
+import AdminNavbar from "../../components/Admin/AdminNavbar";
 import { useAuth } from "../../contexts/AuthContext";
 
 const ViewProduct = () => {
@@ -27,8 +27,9 @@ const ViewProduct = () => {
   const fetchProduct = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get(`/Product/get-product/${id}`);
+      const response = await axiosInstance.get(`/Product/single/${id}`);
       setProduct(response.data);
+      console.log(response.data);
     } catch (error) {
       console.error("Error fetching product:", error);
     } finally {
@@ -132,28 +133,33 @@ const ViewProduct = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Product Image */}
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Product Image</h2>
-                <div className="relative">
-                  {product.imageUrl ? (
-                    <div className="relative">
-                      <img
-                        src={product.imageUrl}
-                        alt={product.name}
-                        className="w-full h-96 object-cover rounded-lg"
-                      />
-                      <button
-                        onClick={() => setShowImageModal(true)}
-                        className="absolute top-4 right-4 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors duration-200"
-                        title="View Full Size"
-                      >
-                        <FaEye />
-                      </button>
-                    </div>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Product Images</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {product.images && product.images.length > 0 ? (
+                    product.images.map((img, index) => (
+                      <div key={index} className="relative">
+                        <img
+                          src={img.url}
+                          alt={`${product.name} - Image ${index + 1}`}
+                          className="w-full h-48 object-cover rounded-lg"
+                        />
+                        <button
+                          onClick={() => {
+                            setSelectedImage(img.url);
+                            setShowImageModal(true);
+                          }}
+                          className="absolute top-2 right-2 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors duration-200"
+                          title="View Full Size"
+                        >
+                          <FaEye />
+                        </button>
+                      </div>
+                    ))
                   ) : (
-                    <div className="w-full h-96 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <div className="w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center col-span-2">
                       <div className="text-center">
                         <FaEye className="text-gray-400 text-4xl mb-2" />
-                        <p className="text-gray-500">No image available</p>
+                        <p className="text-gray-500">No images available</p>
                       </div>
                     </div>
                   )}

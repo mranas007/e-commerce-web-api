@@ -1,31 +1,47 @@
 ﻿using System;
 using AutoMapper;
 using eCommerceApp.Application.DTOs;
+using eCommerceApp.Application.DTOs.Category;
 using eCommerceApp.Application.DTOs.Product;
 using eCommerceApp.Application.Services.Interface;
 using eCommerceApp.Domain.Entities;
+using eCommerceApp.Domain.Entities.Cart;
 using eCommerceApp.Domain.Interface.Product;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace eCommerceApp.Application.Services.Implimentation
 {
     public class ProductService(
         IMapper mapper,
-        IProductRepository productRepository) : IProductService
+        IProductRepository productRepository,
+        ILogger<ProductService> logger,
+        IWebHostEnvironment webHostEnvironment) : IProductService
     {
 
         //***** Add *****//
-        public async Task<ServiceResponse> AddAsync(CreateProduct product, ICollection<IFormFile> ImageFile) // Complated
+        public async Task<ServiceResponse> AddAsync(AddProduct product, IFormFileCollection Images) // Complated
         {
-            IEnumerable<string> ImagesName = await SaveImages(ImageFile);
+            IEnumerable<string> ImagesName = await SaveImages(Images);
 
             // Check if any images were uploaded and saved successfully
             if (ImagesName == null || !ImagesName.Any())
                 return new ServiceResponse(false, "No images were saved successfully.");
 
-            var mappedProduct = mapper.Map<Product>(product);
+            var mappedProduct = new Product
+            {
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                Quantity = product.Quantity,
+                CategoryId = (Guid)product.CategoryId!,
+            };
+
+            //var mappedProduct = mapper.Map<Product>(product);
             int result = await productRepository.AddAsync(mappedProduct, ImagesName);
-           
+
             return result > 0
                 ? new ServiceResponse(true, "Product added successfully.")
                 : new ServiceResponse(false, "Failed to add Product.");
@@ -34,7 +50,23 @@ namespace eCommerceApp.Application.Services.Implimentation
         //***** Delete *****//
         public async Task<ServiceResponse> DeleteAsync(Guid id) // Complated 
         {
-            int result = await productRepository.DeleteAsync(id);
+            // get the product
+            Product product = await productRepository.GetByIdAsync(id);
+            // check is product is not avalaible.
+            if (product is null)
+                return new ServiceResponse(true, "Product not found.");
+
+            // Filter the image names from "Url" property.
+            var imageUrls = product.Images.Select(img => img.Url);
+
+            // delete the all images of this product
+            int check = DeleteImages(imageUrls);
+            if (check == 0)
+            {
+                return new ServiceResponse(false, "Something went wrong to delete images.");
+            }
+
+            int result = await productRepository.DeleteAsync(product.Id);
             if (result == 0)
             {
                 return new ServiceResponse(false, "Product not found.");
@@ -64,7 +96,6 @@ namespace eCommerceApp.Application.Services.Implimentation
             Product product = await productRepository.GetByIdAsync(id);
             if (product == null)
                 return new GetProduct();
-
             var mappedProduct = mapper.Map<GetProduct>(product);
             return mappedProduct;
         }
@@ -85,7 +116,7 @@ namespace eCommerceApp.Application.Services.Implimentation
         }
 
         //***** Save Images *****//
-        public async Task<IEnumerable<string>> SaveImages(ICollection<IFormFile> images)
+        public async Task<IEnumerable<string>> SaveImages(IFormFileCollection images)
         {
             if (images == null || !images.Any())
                 return [];
@@ -94,8 +125,9 @@ namespace eCommerceApp.Application.Services.Implimentation
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
             // List to hold the saved file names
             var fileNames = new List<string>();
+
             // Define the folder path where images will be saved
-            var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "products");
+            var folderPath = Path.Combine(webHostEnvironment.WebRootPath, "images", "products");
 
             // Ensure the directory exists
             if (!Directory.Exists(folderPath))
@@ -126,17 +158,17 @@ namespace eCommerceApp.Application.Services.Implimentation
 
                 fileNames.Add(fileName);
             }
-
+            logger.LogInformation("images are saved in the products folder.");
             return fileNames;
         }
 
         //***** Delete Images *****//
-        public int DeleteImages(ICollection<string> imagesName)
+        public int DeleteImages(IEnumerable<string> imagesName)
         {
             if (imagesName is null || !imagesName.Any())
                 return 0;
 
-            var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "products");
+            var folderPath = Path.Combine(webHostEnvironment.WebRootPath, "images", "products");
             var deletedCount = 0;
 
             foreach (string imageName in imagesName)
@@ -144,7 +176,7 @@ namespace eCommerceApp.Application.Services.Implimentation
                 var fullPath = Path.Combine(folderPath, imageName);
                 if (File.Exists(fullPath))
                 {
-                    try 
+                    try
                     {
                         File.Delete(fullPath);
                         deletedCount++;
@@ -152,6 +184,7 @@ namespace eCommerceApp.Application.Services.Implimentation
                     catch (System.Exception ex)
                     {
                         // Log the error if needed
+                        logger.LogError("something went wrong from product service - DeleteImages: {Error} " + ex.Message);
                         continue;
                     }
                 }

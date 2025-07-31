@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import AdminNavbar from '../../components/AdminNavbar';
+import AdminNavbar from '../../components/Admin/AdminNavbar';
 import axiosInstance from '../../utils/axiosConfig';
 import AdminHeader from '../../components/Admin/AdminHeader';
 

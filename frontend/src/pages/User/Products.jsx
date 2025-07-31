@@ -44,6 +44,7 @@ const Products = () => {
                 // Support both paginated and non-paginated API responses
                 if (Array.isArray(productsRes.data)) {
                     setProducts(productsRes.data);
+                    console.log(productsRes.data)
                     setTotalPages(1);
                 } else {
                     setProducts(productsRes.data.products || []);
@@ -187,16 +188,11 @@ const Products = () => {
                 ) : (
                     <>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {/**** card ****/}
                             {products.map((product) => (
                                 <Card
                                     key={product.id}
-                                    id={product.id}
-                                    image={product.image}
-                                    title={product.name}
-                                    description={product.description}
-                                    price={product.price}
-                                    rating={product.rating}
-                                    cartItems={product.cartItems}
+                                    product={product}
                                 />
                             ))}
                         </div>

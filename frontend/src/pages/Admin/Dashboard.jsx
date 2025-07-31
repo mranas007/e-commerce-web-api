@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaBox, FaUsers, FaShoppingCart, FaChartLine, FaCog, FaPlus } from "react-icons/fa";
 import AdminHeader from "../../components/Admin/AdminHeader";
 import { useAuth } from "../../contexts/AuthContext";
-import axiosInstance from "../../utils/axiosConfig";
-
+import AdminNavbar from "../../components/Admin/AdminNavbar";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -85,6 +84,7 @@ const Dashboard = () => {
 
   return (
     <div className="flex h-screen bg-gray-50">
+      <AdminNavbar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <AdminHeader
           title="Admin Dashboard"

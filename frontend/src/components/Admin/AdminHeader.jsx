@@ -14,7 +14,7 @@ const AdminHeader = ({
   return (
     <div className="bg-white shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-6">
+        <div className="flex flex-wrap justify-between items-center py-4 sm:py-6 gap-4">
           <div className="flex items-center space-x-4">
             {showBackButton && (
               <button
@@ -34,7 +34,7 @@ const AdminHeader = ({
             {showAddButton && (
               <button
                 onClick={onAddClick}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center space-x-2 transition-colors duration-200"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg flex items-center space-x-2 transition-colors duration-200"
               >
                 <FaPlus className="text-sm" />
                 <span>Add Product</span>

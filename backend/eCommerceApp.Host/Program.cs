@@ -3,6 +3,7 @@ using eCommerceApp.Application.DependencyInjection;
 using Serilog;
 using eCommerceApp.Domain.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,11 @@ builder.Host.UseSerilog();
 Log.Information("Application is starting......");
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -53,7 +58,7 @@ try
 {
 
     var app = builder.Build();
-    
+
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
     {
@@ -65,11 +70,11 @@ try
     app.UseHttpsRedirection();
     app.UseCors();
     app.UseSerilogRequestLogging();
-    
+    app.UseStaticFiles();
     // Authentication and Authorization must come before routing
     app.UseAuthentication();
     app.UseAuthorization();
-    
+
     app.UseInfrastructureServices();
 
     app.MapControllers();
@@ -103,7 +108,7 @@ try
                     UserName = "admin",
                     Email = "admin@admin.com"
                 };
-                
+
                 var result = await userManager.CreateAsync(admin, "Admin@123"); // Use a secure password in production
                 if (result.Succeeded)
                 {

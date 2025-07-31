@@ -13,6 +13,7 @@ import EditProduct from "./pages/Admin/EditProduct";
 import ViewProduct from "./pages/Admin/ViewProduct";
 import CategoryList from "./pages/Admin/CategoryList";
 import CategoryForm from "./pages/Admin/CategoryForm";
+import UserList from "./pages/Admin/UserList";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ConfirmEmail from "./pages/Account/ConfirmEmail";
 
@@ -84,6 +85,11 @@ const AppRoutes = () => (
     <Route path="/admin/categories/edit/:id" element={
       <ProtectedRoute requireAdmin={true}>
         <CategoryForm />
+      </ProtectedRoute>
+    } />
+    <Route path="/admin/users" element={
+      <ProtectedRoute requireAdmin={true}>
+        <UserList />
       </ProtectedRoute>
     } />
   </Routes>

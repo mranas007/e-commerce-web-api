@@ -3,6 +3,7 @@ using eCommerceApp.Application.Services.Implimentation;
 using eCommerceApp.Application.Services.Interface;
 using eCommerceApp.Application.Services.Interface.Authentication;
 using eCommerceApp.Application.Services.Interface.Cart;
+using eCommerceApp.Application.Services.Interface.User;
 using eCommerceApp.Application.Validations;
 using eCommerceApp.Application.Validations.Authentications;
 using FluentValidation;
@@ -26,6 +27,7 @@ namespace eCommerceApp.Application.DependencyInjection
             services.AddScoped<IAuthenticationService, AuthenticationService>();    
             services.AddScoped<IPaymentMethodServices, PaymentMethodService>();
             services.AddScoped<ICartService, CartService>();
+            services.AddScoped<IUserService, UserService>();
             return services;
         }
     }

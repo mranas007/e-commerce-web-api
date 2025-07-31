@@ -9,4 +9,8 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.10" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Interface\User\" />
+	</ItemGroup>
 </Project>

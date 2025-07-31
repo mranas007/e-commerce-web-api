@@ -1,25 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Navigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosConfig";
-import { FaStar, FaStarHalfAlt, FaRegStar, FaShoppingCart } from "react-icons/fa";
+import { FaShoppingCart } from "react-icons/fa";
 import { useAuth } from "../../contexts/AuthContext";
 
-const renderRatingStars = (rating) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-    for (let i = 0; i < fullStars; i++) {
-        stars.push(<FaStar key={`star-${i}`} className="text-yellow-400" />);
-    }
-    if (hasHalfStar) {
-        stars.push(<FaStarHalfAlt key="half-star" className="text-yellow-400" />);
-    }
-    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-    for (let i = 0; i < emptyStars; i++) {
-        stars.push(<FaRegStar key={`empty-star-${i}`} className="text-yellow-400" />);
-    }
-    return stars;
-};
+
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -66,17 +51,25 @@ const ProductDetails = () => {
     return (
         <div className="container mx-auto px-4 py-10">
             <div className="flex flex-col md:flex-row gap-10 bg-white rounded-lg shadow-lg p-8">
-                <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full md:w-1/2 h-96 object-cover rounded"
-                />
+                <div className="w-full md:w-1/2">
+                    <img
+                        src={`${import.meta.env.VITE_PRODUCT_IMAGES_URL}${product.images[0]?.url}`}
+                        alt={product.name}
+                        className="w-full h-96 object-cover rounded mb-4"
+                    />
+                    <div className="flex space-x-2 overflow-x-auto">
+                        {product.images.map((image, index) => (
+                            <img
+                                key={index}
+                                src={`${import.meta.env.VITE_PRODUCT_IMAGES_URL}${image.url}`}
+                                alt={`${product.name} thumbnail ${index + 1}`}
+                                className="w-24 h-24 object-cover rounded cursor-pointer border-2 border-transparent hover:border-blue-500"
+                            />
+                        ))}
+                    </div>
+                </div>
                 <div className="flex-1">
                     <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
-                    <div className="flex items-center mb-2">
-                        {renderRatingStars(product.rating)}
-                        <span className="ml-2 text-gray-600">({product.rating})</span>
-                    </div>
                     <p className="text-xl text-green-600 font-bold mb-4">${product.price}</p>
                     <p className="mb-6 text-gray-700">{product.description}</p>
                     <button

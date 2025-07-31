@@ -6,6 +6,7 @@ import axiosInstance from '../../utils/axiosConfig';
 import { FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
 
 import { useAuth } from '../../contexts/AuthContext';
+import AdminNavbar from '../../components/Admin/AdminNavbar';
 
 const CategoryList = () => {
   const [categories, setCategories] = useState([]);
@@ -70,6 +71,7 @@ const CategoryList = () => {
 
   return (
     <div className="flex h-screen bg-gray-50">
+      <AdminNavbar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <AdminHeader
           title="Category Management"

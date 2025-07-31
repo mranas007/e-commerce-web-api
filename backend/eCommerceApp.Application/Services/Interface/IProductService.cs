@@ -8,10 +8,10 @@ namespace eCommerceApp.Application.Services.Interface
     {
         Task<IEnumerable<GetProduct>> GetAllAsync(string userId, string search, string category);
         Task<GetProduct> GetByIdAsync(Guid id);
-        Task<ServiceResponse> AddAsync(CreateProduct product, ICollection<IFormFile> ImageFile);
+        Task<ServiceResponse> AddAsync(AddProduct product, IFormFileCollection Images);
         Task<ServiceResponse> UpdateAsync(UpdateProduct product);
         Task<ServiceResponse> DeleteAsync(Guid id);
-        Task<IEnumerable<string>> SaveImages(ICollection<IFormFile> images);
-        int DeleteImages(ICollection<string> imagesName);
+        Task<IEnumerable<string>> SaveImages(IFormFileCollection images);
+        int DeleteImages(IEnumerable<string> imagesName);
     } 
 }

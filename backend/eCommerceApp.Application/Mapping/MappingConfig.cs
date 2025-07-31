@@ -2,6 +2,7 @@
 using eCommerceApp.Application.DTOs.Cart;
 using eCommerceApp.Application.DTOs.Category;
 using eCommerceApp.Application.DTOs.Identity;
+using eCommerceApp.Application.DTOs.NewFolder;
 using eCommerceApp.Application.DTOs.Product;
 using eCommerceApp.Domain.Entities;
 using eCommerceApp.Domain.Entities.Cart;
@@ -19,6 +20,7 @@ namespace eCommerceApp.Application.Mapping
 
             CreateMap<Category, GetCategory>();
             CreateMap<Product, GetProduct>();
+            CreateMap<GetProduct, Product>();
 
             CreateMap<UpdateCategory, Category>();
             
@@ -30,6 +32,9 @@ namespace eCommerceApp.Application.Mapping
 
             CreateMap<CartItem, CartItemDto>();
             CreateMap<Product, ProductDto>();
+
+            CreateMap<AddProduct, Product>();
+            CreateMap<AppUser, GetUserDto>();
         }
     }
 }

@@ -13,9 +13,11 @@ namespace eCommerceApp.Host.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
-        public ProductController(IProductService productService)
+        private readonly ILogger _logger;
+        public ProductController(IProductService productService, ILogger<ProductController> logger)
         {
             _productService = productService;
+            _logger = logger;
         }
 
         // get all
@@ -41,17 +43,25 @@ namespace eCommerceApp.Host.Controllers
         }
 
         // Add
-        [HttpPost("add")]
-        public async Task<IActionResult> Add([FromForm] CreateProduct createProduct, [FromForm] ICollection<IFormFile> imageFiles)
+        [HttpPost("add-product")]
+        public async Task<IActionResult> Add([FromForm] AddProduct product)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            if (imageFiles == null || imageFiles.Count == 0)
-                return BadRequest("Image file not found.");
+                ServiceResponse result = await _productService.AddAsync(product, product.Images!);
+                return result.Success ? Ok(result) : BadRequest(result.Message);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception details to your server logs
+                _logger.LogError(ex, "Error adding product");
+                return StatusCode(500, "An internal server error occurred.");
+            }
 
-            ServiceResponse result = await _productService.AddAsync(createProduct, imageFiles);
-            return result.Success ? Ok(result) : BadRequest(result.Message);
+
         }
 
         // update

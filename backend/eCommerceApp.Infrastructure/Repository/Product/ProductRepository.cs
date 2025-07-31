@@ -1,14 +1,17 @@
 ﻿using eCommerceApp.Domain.Entities;
-using System;
 using eCommerceApp.Domain.Entities.Cart;
 using eCommerceApp.Domain.Interface.Product;
 using eCommerceApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Hosting;
 
 namespace eCommerceApp.Infrastructure.Repository.Product
 {
     public class ProductRepository(AppDbContext context,
-        IProductImagesRepository productImagesRepository) : IProductRepository
+        IProductImagesRepository productImagesRepository,
+        IWebHostEnvironment webHostEnvironment,
+        ILogger<ProductRepository> logger) : IProductRepository
     {
 
         // Add
@@ -16,30 +19,44 @@ namespace eCommerceApp.Infrastructure.Repository.Product
         {
             try
             {
+                if (product == null)
+                    return 0;
                 // Add product to context
                 await context.Products.AddAsync(product);
-                
                 // Save product first to get the ID
                 var result = await context.SaveChangesAsync();
-
                 if (result > 0 && ImagesName != null && ImagesName.Any())
                 {
-                    // Create and add product images
-                    var productImages = ImagesName.Select(imageName => new ProductImage
+                    try
                     {
-                        Url = imageName,
-                        ProductId = product.Id
-                    });
+                        // Create and add product images
+                        List<ProductImage> productImages = ImagesName.Select(imageName => new ProductImage
+                        {
+                            Url = imageName,
+                            ProductId = product.Id
+                        }).ToList();
 
-                    // Add all images in batch
-                    await productImagesRepository.AddRangeAsync(productImages);
+                        // Add all images in batch
+                        await productImagesRepository.AddRangeAsync(productImages);
+                        logger.LogInformation("products and images are saved successfully!");
+                        return result;
+                    }
+                    catch (System.Exception er)
+                    {
+                        // If image addition fails, delete the product
+                        context.Products.Remove(product);
+                        await context.SaveChangesAsync();
+                        logger.LogError("Error adding product images: {Error}", er.Message);
+                        return 0;
+                    }
                 }
-
-                return result;
+                logger.LogDebug("Error, Product isn't saved.");
+                return -1;
             }
-            catch (Exception)
+            catch (System.Exception er)
             {
-                // If anything fails, return 0 to indicate failure
+                // If anything fails, return -1 to indicate failure
+                logger.LogError("Something went wrong: {Error}", er.Message);
                 return -1;
             }
         }
@@ -49,6 +66,7 @@ namespace eCommerceApp.Infrastructure.Repository.Product
         {
             // Start with base query including Category
             var query = context.Products
+                .Include(i => i.Images)
                 .AsNoTracking()
                 .AsQueryable();
 
@@ -97,7 +115,13 @@ namespace eCommerceApp.Infrastructure.Repository.Product
         // Get by ID
         public async Task<Domain.Entities.Product> GetByIdAsync(Guid id)
         {
-            return await context.Products.FindAsync(id);
+            Domain.Entities.Product? product = await context.Products
+               .AsNoTracking()
+               .Include(i => i.Images)
+               .Include(c => c.Category)
+               .FirstOrDefaultAsync(p => p.Id == id);
+
+            return product ?? new Domain.Entities.Product();
         }
 
         // Update
